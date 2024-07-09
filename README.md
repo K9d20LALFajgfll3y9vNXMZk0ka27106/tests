@@ -1,2 +1,2 @@
 ##
-Paidwork  Translation Library
+Library for tests
