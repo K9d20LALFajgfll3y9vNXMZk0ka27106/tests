@@ -22,7 +22,7 @@ class TranslationSystem
         $this->app_name = $app_name;
         $this->translateLanguages = $translateLanguages;
     
-        $configurations = include './config.php'; 
+        $configurations = include __DIR__ . '/config.php'; 
 
         if (isset($configurations[$app_name])) {
             $this->baseDir = $root_path . $configurations[$app_name]['baseDir'];

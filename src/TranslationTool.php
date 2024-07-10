@@ -64,7 +64,7 @@ class TranslationTool {
         $this->app_name = $app_name;
         $this->root_path = $root_path;
 
-        $configurations = include './config.php'; 
+        $configurations = include __DIR__ . '/config.php'; 
 
         if (isset($configurations[$app_name])) {
             $this->baseDir = $root_path . $configurations[$app_name]['baseDir'];
