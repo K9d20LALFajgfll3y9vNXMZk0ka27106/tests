@@ -9,17 +9,29 @@ use RecursiveIteratorIterator;
 class TranslationSystem
 {
     private $keyFilePath;
+    private $root_path;
+    private $app_name;
     private $baseDir;
     private $standardLangDir;
     private $translateLanguages;
 
-    public function __construct($keyFilePath, $baseDir, $standardLangDir, $translateLanguages)
+    public function __construct($keyFilePath, $app_name, $root_path, $translateLanguages)
     {
         $this->keyFilePath = $keyFilePath;
-        $this->baseDir = $baseDir;
-        $this->standardLangDir = $standardLangDir;
+        $this->root_path = $root_path;
+        $this->app_name = $app_name;
         $this->translateLanguages = $translateLanguages;
+    
+        $configurations = include './config.php'; 
+
+        if (isset($configurations[$app_name])) {
+            $this->baseDir = $root_path . $configurations[$app_name]['baseDir'];
+            $this->standardLangDir = $root_path . $configurations[$app_name]['standardLangDir'];
+        } else {
+            throw new Exception("Unrecognized app_name: " . $app_name);
+        }
     }
+    
 
     public function translateVariables()
     {
@@ -113,6 +125,18 @@ class TranslationSystem
                         $comparisonResults[$langCode][$relativePath] = $result;
                     }
                 }
+            }
+
+            echo "<h1>Automatic file translation</h1> ";
+
+            if (count($comparisonResults) > 0 ) {
+                foreach ($comparisonResults as $langCode => $files) {
+                    foreach ($files as $filePath => $result) {
+                        echo "<br><span style='color:" . ($result['type'] === 'Success' ? 'green' : 'red') . ";'>Variables in file <b>{$result['filePath']}</b> have been {$result['type']}fully translated to language <b>{$result['langCode']}</b>.</span>";
+                    }
+                }
+            }else {
+                echo "No files found requiring new translations";
             }
 
             return $comparisonResults;

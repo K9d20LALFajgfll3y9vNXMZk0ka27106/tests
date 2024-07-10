@@ -50,14 +50,28 @@ use RecursiveIteratorIterator;
 class TranslationTool {
     private $baseDir;
     private $standardLangDir;
+
+    private $app_name;
+    private $root_path;
+
     private $excludedWords = [
         'Paidwork', 'Apple', 'Microsoft', 'Amazon', 'Facebook', 
         'Twitter', 'Instagram', 'LinkedIn', 'Pinterest', 'Reddit', 'TikTok'
     ];
 
-    public function __construct($baseDir, $standardLangDir) {
-        $this->baseDir = $baseDir;
-        $this->standardLangDir = $standardLangDir;
+    public function __construct($app_name, $root_path) {
+
+        $this->app_name = $app_name;
+        $this->root_path = $root_path;
+
+        $configurations = include './config.php'; 
+
+        if (isset($configurations[$app_name])) {
+            $this->baseDir = $root_path . $configurations[$app_name]['baseDir'];
+            $this->standardLangDir = $root_path . $configurations[$app_name]['standardLangDir'];
+        } else {
+            throw new Exception("Unrecognized app_name: " . $app_name);
+        }
     }
 
     private function countFilesRecursively($dir, &$filesList = []) {
@@ -215,6 +229,8 @@ class TranslationTool {
         $counts = $this->countFilesAndDirectoriesInDirectories($this->baseDir);
         $missingFiles = $this->findMissingFiles($counts, $standardFilesList);
         $comparisonResults = $this->compareLangVariables();
+
+        echo "<h1>Validation of language files</h1>";
 
         echo "<h3>Structure</h3>";
 
